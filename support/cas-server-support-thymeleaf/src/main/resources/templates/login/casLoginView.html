@@ -8,8 +8,6 @@
 
 <body class="login mdc-typography">
 <div layout:fragment="content" class="d-flex justify-content-center">
-    <h1>CAS LOGIN VIEW</h1>
-
    <div class="d-flex justify-content-center flex-md-row flex-column mdc-card mdc-card-content card flex-grow-1"
          th:with="loginFormEnabled=${#cas.isTrue(#themes.code('cas.login-form.enabled'))},
                   loginFormViewable=${#cas.isLoginFormViewable(#vars)}">

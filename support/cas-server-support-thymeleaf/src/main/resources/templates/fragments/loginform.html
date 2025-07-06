@@ -32,7 +32,7 @@
         </div>
 
         <div class="form-wrapper">
-
+            <!-- 表单提交：https://example.com/cas/login -->
             <form method="post" id="fm1" th:object="${credential}" action="login" onsubmit="loginFormSubmission();">
                 <div id="login-form-controls" th:unless="${loginFormViewable or loginFormEnabled}">
                     <div id="loginErrorsPanel" class="alert alert-danger banner banner-danger banner-dismissible"
@@ -266,7 +266,7 @@
                             $('[name="deviceFingerprint"]').val(fingerprint);
                         </script>
                     </section>
-
+                    <!-- 登录按钮 -->
                     <div th:replace="~{fragments/submitbutton :: submitButton (messageKey='screen.welcome.button.login')}"/>
                 </div>
             </form>

@@ -80,7 +80,11 @@ public class DefaultLoginWebflowConfigurer extends AbstractCasWebflowConfigurer 
         createSessionStorageStates(flow);
     }
 
+    // 创建登录表单视图状态
+    // 绑定用户名、密码等表单字段
+    // 设置表单提交的转换目标状态
     protected void createLoginFormView(final Flow flow) {
+        // 表单字段绑定配置
         val propertiesToBind = Map.of(
             CasProtocolConstants.PARAMETER_USERNAME, Map.of("required", "true"),
             CasProtocolConstants.PARAMETER_PASSWORD, Map.of("converter", StringToCharArrayConverter.ID),
@@ -95,6 +99,7 @@ public class DefaultLoginWebflowConfigurer extends AbstractCasWebflowConfigurer 
         val state = createViewState(flow, CasWebflowConstants.STATE_ID_VIEW_LOGIN_FORM, "login/casLoginView", binder);
         createStateModelBinding(state, CasWebflowConstants.VAR_ID_CREDENTIAL, UsernamePasswordCredential.class);
 
+        // 提交转移配置 创建从登录表单到realSubmit状态的转移, 转移触发事件为submit
         val transition = createTransitionForState(state, CasWebflowConstants.TRANSITION_ID_SUBMIT, CasWebflowConstants.STATE_ID_REAL_SUBMIT);
         val attributes = transition.getAttributes();
         val createdAttributes = createTransitionAttributes(true, true);
@@ -138,6 +143,8 @@ public class DefaultLoginWebflowConfigurer extends AbstractCasWebflowConfigurer 
         createTicketGrantingTicketCheckAction(flow);
     }
 
+    // 创建处理表单提交的动作状态
+    // 定义了多种转换路径：
     protected void createRealSubmitAction(final Flow flow) {
         val state = createActionState(flow, CasWebflowConstants.STATE_ID_REAL_SUBMIT,
             CasWebflowConstants.ACTION_ID_AUTHENTICATION_VIA_FORM_ACTION);
@@ -180,6 +187,8 @@ public class DefaultLoginWebflowConfigurer extends AbstractCasWebflowConfigurer 
         createStateDefaultTransition(terminateSession, CasWebflowConstants.STATE_ID_GATEWAY_REQUEST_CHECK);
     }
 
+    // 创建发送Ticket Granting Ticket(TGT)的动作状态
+    // 成功后会转换到服务检查状态
     protected void createSendTicketGrantingTicketAction(final Flow flow) {
         val action = createActionState(flow, CasWebflowConstants.STATE_ID_SEND_TICKET_GRANTING_TICKET,
             CasWebflowConstants.ACTION_ID_SEND_TICKET_GRANTING_TICKET);
@@ -234,6 +243,8 @@ public class DefaultLoginWebflowConfigurer extends AbstractCasWebflowConfigurer 
             CasWebflowConstants.STATE_ID_GATEWAY_SERVICES_MGMT);
     }
 
+    // 处理各种认证异常情况
+    // 为不同类型的异常定义不同的转换路径：
     protected void createHandleAuthenticationFailureAction(final Flow flow) {
         val authnFailure = createActionState(flow, CasWebflowConstants.STATE_ID_HANDLE_AUTHN_FAILURE,
             CasWebflowConstants.ACTION_ID_AUTHENTICATION_EXCEPTION_HANDLER);

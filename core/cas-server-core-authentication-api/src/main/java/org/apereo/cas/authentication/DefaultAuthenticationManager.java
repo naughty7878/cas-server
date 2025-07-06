@@ -162,6 +162,8 @@ public class DefaultAuthenticationManager implements AuthenticationManager {
 
         try {
             AuthenticationHolder.setCurrentAuthentication(authenticationBuilder.build());
+
+            // 认证执行
             val handlerExecutionResult = handler.authenticate(credential, service);
             val authenticationHandlerName = handler.getName();
             authenticationBuilder.addSuccess(authenticationHandlerName, handlerExecutionResult);
@@ -209,22 +211,28 @@ public class DefaultAuthenticationManager implements AuthenticationManager {
     protected AuthenticationBuilder authenticateInternal(final AuthenticationTransaction transaction) throws Throwable {
         val credentials = transaction.getCredentials();
         LOGGER.debug("Authentication credentials provided for this transaction are [{}]", credentials);
-
+        // 空凭证检查
         if (credentials.isEmpty()) {
             LOGGER.error("Resolved authentication handlers for this transaction are empty");
             throw new AuthenticationException("Resolved credentials for this transaction are empty");
         }
-
+        // 构建认证结果容器
         val authenticationBuilder = new DefaultAuthenticationBuilder(NullPrincipal.getInstance());
         credentials.forEach(authenticationBuilder::addCredential);
-
+        // 根据事务特征（如服务URL）获取适用的认证处理器
+        // 典型处理器：
+        // LdapAuthenticationHandler（LDAP认证）
+        // JdbcAuthenticationHandler（数据库认证）
+        // X509AuthenticationHandler（证书认证）
         val handlerSet = authenticationEventExecutionPlan.resolveAuthenticationHandlers(transaction);
         LOGGER.debug("Candidate resolved authentication handlers for this transaction are [{}]", handlerSet);
 
         try {
+            // 双重循环认证
+            // 凭证级循环
             for (val credential : credentials) {
                 LOGGER.debug("Attempting to authenticate credential [{}]", credential);
-
+                // 处理器级循环
                 val itHandlers = handlerSet.iterator();
                 var proceedWithNextHandler = true;
                 while (proceedWithNextHandler && itHandlers.hasNext()) {
@@ -233,6 +241,11 @@ public class DefaultAuthenticationManager implements AuthenticationManager {
                         try {
                             val resolver = getPrincipalResolverLinkedToHandlerIfAny(handler, transaction);
                             LOGGER.debug("Attempting authentication of [{}] using [{}]", credential.getId(), handler.getName());
+
+                            // 认证执行核心
+                            // 凭证验证：调用 handler.authenticate(credential)
+                            // 主体解析：通过 PrincipalResolver 转换认证结果
+                            // 结果收集：将成功/失败证据存入 authenticationBuilder
                             authenticateAndResolvePrincipal(authenticationBuilder, credential, resolver, handler, transaction.getService());
 
                             val authnResult = authenticationBuilder.build();
@@ -256,6 +269,7 @@ public class DefaultAuthenticationManager implements AuthenticationManager {
                     }
                 }
             }
+            // 策略评估
             evaluateFinalAuthentication(authenticationBuilder, transaction, handlerSet);
             return authenticationBuilder;
         } finally {

@@ -8,10 +8,11 @@
 
 <body class="login mdc-typography">
 <div layout:fragment="content" class="d-flex justify-content-center">
+    <h1>CAS LOGIN VIEW</h1>
+
    <div class="d-flex justify-content-center flex-md-row flex-column mdc-card mdc-card-content card flex-grow-1"
          th:with="loginFormEnabled=${#cas.isTrue(#themes.code('cas.login-form.enabled'))},
                   loginFormViewable=${#cas.isLoginFormViewable(#vars)}">
-
         <section id="loginSidePanel"
                  th:if="${loginFormViewable and loginFormEnabled and #cas.isTrue(#themes.code('cas.login-side-panel.enabled'))}"
                  class="login-section d-xs-none d-md-block card-body">
@@ -20,6 +21,7 @@
             </div>
         </section>
 
+       <!-- 主登录表单 (loginForm) -->
         <section id="loginForm"
                  th:if="${loginFormViewable and loginFormEnabled}"
                  class="login-section login-form card-body">
@@ -27,6 +29,7 @@
                 <a href="fragments/loginform.html">Login Form goes here</a>
             </div>
         </section>
+       <!-- 第三方登录提供者 (loginProviders) -->
         <section id="loginProviders" class="login-section login-providers card-body"
                 th:if="${(#bools.isFalse(delegatedAuthenticationDynamicProviderSelection)
                        && #bools.isFalse(delegatedAuthenticationDisabled))
@@ -36,6 +39,7 @@
                 <a href="fragments/loginProviders.html">loginProviders</a>
             </div>
         </section>
+       <!-- 二维码登录 (qrlogin) -->
         <section id="qrlogin" class="login-section login-qr d-xs-none d-md-block card-body" th:if="${qrAuthenticationEnabled}">
             <div th:replace="~{fragments/qrAuthentication :: qrAuthentication}">
                 <a href="fragments/qrAuthentication.html">qrAuthentication</a>

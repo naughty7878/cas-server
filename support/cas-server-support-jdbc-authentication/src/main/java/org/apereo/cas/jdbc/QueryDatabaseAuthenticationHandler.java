@@ -54,19 +54,26 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
     @Override
     protected AuthenticationHandlerExecutionResult authenticateUsernamePasswordInternal(
         final UsernamePasswordCredential credential, final String originalPassword) throws Throwable {
+        // 1. 凭证提取
         val username = credential.getUsername();
         val password = credential.toPassword();
         try {
+            // 2. 数据库查询
             val dbFields = query(credential);
+            // 3. 密码验证策略
             if (dbFields.containsKey(properties.getFieldPassword())) {
+                // 场景1：存在密码字段
                 val dbPassword = (String) dbFields.get(properties.getFieldPassword());
-
+                // 两种匹配方式：
+                // 1. 使用PasswordEncoder匹配(当originalPassword存在)
+                // 2. 直接字符串比较
                 val originalPasswordMatchFails = StringUtils.isNotBlank(originalPassword) && !matches(originalPassword, dbPassword);
                 val originalPasswordEquals = StringUtils.isBlank(originalPassword) && !StringUtils.equals(password, dbPassword);
                 if (originalPasswordMatchFails || originalPasswordEquals) {
                     throw new FailedLoginException("Password does not match value on record.");
                 }
             } else {
+                // 场景2：无密码字段
                 LOGGER.debug("Password field is not found in the query results. Checking for result count...");
                 if (!dbFields.containsKey("total")) {
                     throw new FailedLoginException("Missing field 'total' from the query results for " + username);
@@ -84,19 +91,23 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
                 }
             }
 
+            // 4. 账户状态检查
+            // 检查禁用状态
             if (StringUtils.isNotBlank(properties.getFieldDisabled()) && dbFields.containsKey(properties.getFieldDisabled())) {
                 val dbDisabled = dbFields.get(properties.getFieldDisabled()).toString();
                 if (BooleanUtils.toBoolean(dbDisabled) || "1".equals(dbDisabled)) {
                     throw new AccountDisabledException("Account has been disabled");
                 }
             }
+            // 检查密码过期
             if (StringUtils.isNotBlank(properties.getFieldExpired()) && dbFields.containsKey(properties.getFieldExpired())) {
                 val dbExpired = dbFields.get(properties.getFieldExpired()).toString();
                 if (BooleanUtils.toBoolean(dbExpired) || "1".equals(dbExpired)) {
                     throw new AccountPasswordMustChangeException("Password has expired");
                 }
             }
-
+            // 5. 主体构建
+            // 收集其他字段作为属性
             val attributes = collectPrincipalAttributes(dbFields);
             val principal = this.principalFactory.createPrincipal(username, attributes);
             return createHandlerResult(credential, principal, new ArrayList<>());

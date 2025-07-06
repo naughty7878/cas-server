@@ -56,6 +56,7 @@ public abstract class BaseCasWebflowAction extends AbstractAction {
         return super.doPreExecute(requestContext);
     }
 
+    // 核心处理方法
     @Override
     protected final Event doExecute(final RequestContext requestContext) throws Exception {
         val activeFlow = requestContext.getActiveFlow();
@@ -67,6 +68,8 @@ public abstract class BaseCasWebflowAction extends AbstractAction {
             scope.putAll(requestContext.getFlowScope().asMap());
             scope.putAll(requestContext.getFlashScope().asMap());
             applicationContext.publishEvent(new CasWebflowActionExecutingEvent(this, scope, clientInfo));
+
+            // 调用doExecuteInternal核心处理方法
             return doExecuteInternal(requestContext);
         } catch (final Exception e) {
             throw e;

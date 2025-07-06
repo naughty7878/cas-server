@@ -1,3 +1,59 @@
 spring:
   main:
     lazy-initialization: false
+
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.apereo.cas: DEBUG
+
+
+## 公共配置
+#jdbc:
+#  defaults:
+#    dialect: org.hibernate.dialect.MySQLDialect
+#    driverClass: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.1.170:3306/cas?characterEncoding=UTF-8&nullCatalogMeansCurrent=true&useSSL=false&rewriteBatchedStatements=true
+#    user: root
+#    password: "1234567"
+
+# 认证配置
+cas:
+  authn:
+    jdbc:
+      query:
+        - dialect: org.hibernate.dialect.MySQLDialect
+          driverClass: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://192.168.1.170:3306/cas?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8
+          user: root
+          password: 123456
+          sql: "select * from user where username=?"
+          fieldPassword: password
+          fieldExpired: expired_flag
+          fieldDisabled: disabled_flag
+    #        passwordEncoder:
+    #          type: None
+    #          characterEncoding: UTF-8
+    #            encodingAlgorithm: BCRYPT
+
+    attributeRepository:
+      jdbc:
+        - dialect: org.hibernate.dialect.MySQLDialect
+          driverClass: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://192.168.1.170:3306/cas?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8
+          user: root
+          password: 123456
+          sql: "select * from user where {0}"
+          username: username
+          singleRow: true
+          order: 0
+          requireAllAttributes: true
+          attributes:
+            id: id
+            username: username
+            first_name: first_name
+            last_name: last_name
+            email: email

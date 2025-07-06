@@ -110,6 +110,9 @@ dependencies {
     
     testImplementation libraries.graalvmsdk
     testImplementation libraries.graalvmpolyglot
+
+    // 增加jdbc依赖
+    implementation project(":support:cas-server-support-jdbc")
 }
 
 graalvmNative {

@@ -1,0 +1,8 @@
+{
+  "@class" : "org.apereo.cas.services.CasRegisteredService",
+  "serviceId": "^(https|imaps)://app.test.com",
+  "name" : "AppTest",
+  "theme" : "mytheme",
+  "id" : 10001,
+  "evaluationOrder" : 10
+}

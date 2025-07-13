@@ -112,7 +112,12 @@ dependencies {
     testImplementation libraries.graalvmpolyglot
 
     // 增加jdbc依赖
-    implementation project(":support:cas-server-support-jdbc")
+//    implementation project(":support:cas-server-support-jdbc")
+    // 增加服务注册依赖
+    implementation project(":support:cas-server-support-json-service-registry")
+    // 增加主题配置依赖
+    implementation project(":support:cas-server-support-themes")
+
 }
 
 graalvmNative {

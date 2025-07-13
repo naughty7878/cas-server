@@ -1,0 +1,9 @@
+/*
+  This CSS file is meant to be customized by deployments
+  and is intentionally left empty. Any style that is added
+  here should override the default styles in the application.
+ */
+.text-center {
+    color: green;
+    text-align: left;
+}
